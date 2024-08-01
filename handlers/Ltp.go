@@ -1,0 +1,64 @@
+package handlers
+
+import (
+	"strconv"
+
+	"github.com/gofiber/fiber/v2"
+	"github.com/sabrihanane/go-network-api-fiber-postgres/database"
+	"github.com/sabrihanane/go-network-api-fiber-postgres/models"
+)
+
+func GetLtps(c *fiber.Ctx) error {
+	var ltps []models.Ltp
+	database.DB.Find(&ltps)
+	return c.JSON(ltps)
+}
+
+func GetLtpById(c *fiber.Ctx) error {
+	id := c.Params("id")
+	ltpId, err := strconv.Atoi(id)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid id"})
+	}
+
+	var ltp models.Ltp
+	err1 := database.DB.First(&ltp, uint(ltpId))
+	if err1.Error != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Ltp not found"})
+	}
+	return c.Status(fiber.StatusOK).JSON(ltp)
+}
+
+func CreateLtp(c *fiber.Ctx) error {
+	ltp := new(models.Ltp)
+
+	if err := c.BodyParser(ltp); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(err.Error())
+	}
+	// Validate the data
+	if ltp.Name == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Ltp name can not be empty!"})
+	}
+
+	var ltpModel models.Ltp
+	result := database.DB.Where("name = ? AND description = ? ", ltp.Name, ltp.Description).First(&ltpModel)
+
+	if result.Error == nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Ltp with the same name and the same description already exists"})
+	}
+
+	database.DB.Create(&ltp)
+	return c.JSON(ltp)
+}
+
+func UpdateLtp(c *fiber.Ctx) error {
+	ltp := new(models.Ltp)
+	if err := c.BodyParser(ltp); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(err.Error())
+	}
+	result := database.DB.Model(&models.Ltp{}).Where("id = ?", ltp.ID).Updates(ltp)
+	if result.Error != nil {
+		return c.Status(fiber.StatusNotModified).JSON(fiber.Map{"error": "Updating ltp failed"})
+	}
+	return c.JSON(ltp)
+}
