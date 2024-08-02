@@ -62,3 +62,22 @@ func UpdateLtp(c *fiber.Ctx) error {
 	}
 	return c.JSON(ltp)
 }
+
+func DeleteLtpById(c *fiber.Ctx) error {
+	ltp := new(models.Ltp)
+
+	id := c.Params("id")
+	if err := database.DB.First(&ltp, id).Error; err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error": "Ltp not found",
+		})
+	}
+
+	if err := database.DB.Delete(&ltp).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Failed to delete ltp",
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"message": "Ltp has been deleted"})
+}

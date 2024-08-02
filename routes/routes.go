@@ -11,6 +11,7 @@ func Setup(app *fiber.App) {
 	ltpGroup.Get("/get_ltp_by_id/:id", handlers.GetLtpById)
 	ltpGroup.Post("/create_ltp", handlers.CreateLtp)
 	ltpGroup.Put("/update_ltp", handlers.UpdateLtp)
+	ltpGroup.Delete("/delete_ltp_by_id/:id", handlers.DeleteLtpById)
 
 	nodeGroup := app.Group("/node")
 	nodeGroup.Get("/get_nodes", handlers.GetNodes)
