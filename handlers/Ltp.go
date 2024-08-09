@@ -29,6 +29,16 @@ func GetLtpById(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(ltp)
 }
 
+func GetLtpByName(c *fiber.Ctx) error {
+	name := c.Params("name")
+	var ltp models.Ltp
+	err := database.DB.Where("name = ?", name).First(&ltp)
+	if err.Error != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Ltp not found"})
+	}
+	return c.Status(fiber.StatusOK).JSON(ltp)
+}
+
 func CreateLtp(c *fiber.Ctx) error {
 	ltp := new(models.Ltp)
 
@@ -81,3 +91,5 @@ func DeleteLtpById(c *fiber.Ctx) error {
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"message": "Ltp has been deleted"})
 }
+
+// get node by name and get link by name and ltp by name, unique name

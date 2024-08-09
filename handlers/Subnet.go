@@ -12,6 +12,16 @@ func GetSubnets(c *fiber.Ctx) error {
 	return c.JSON(subnets)
 }
 
+func GetSubnetByName(c *fiber.Ctx) error {
+	name := c.Params("name")
+	var subnet models.Subnet
+	err := database.DB.Where("name = ?", name).First(&subnet)
+	if err.Error != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Subnet not found"})
+	}
+	return c.Status(fiber.StatusOK).JSON(subnet)
+}
+
 func CreateSubnet(c *fiber.Ctx) error {
 	subnet := new(models.Subnet)
 

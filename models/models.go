@@ -10,13 +10,13 @@ import (
 
 type Network struct {
 	gorm.Model
-	Name    string
+	Name    string   `gorm:"unique"`
 	Subnets []Subnet `gorm:"type:bytes;serializer:json"`
 }
 
 type Subnet struct {
 	gorm.Model
-	Name     string  `gorm:"type:varchar(255)" json:"name"`
+	Name     string  `gorm:"type:varchar(255)" json:"name" gorm:"unique"`
 	ParentID *uint64 `gorm:"index"`
 	Nodes    []Node
 	Links    []Link
@@ -38,7 +38,7 @@ func (j JSONB) Value() (driver.Value, error) {
 
 type Ltp struct {
 	gorm.Model
-	Name string `gorm:"type:varchar(255)" json:"name"`
+	Name string `gorm:"type:varchar(255)" json:"name" gorm:"unique"`
 	//Group       bool
 	Description string `gorm:"type:varchar(255)" json:"label"`
 	Busy        bool
@@ -49,7 +49,7 @@ type Ltp struct {
 
 type Node struct {
 	gorm.Model
-	Name        string `gorm:"type:varchar(255)"`
+	Name        string `gorm:"type:varchar(255)" gorm:"unique"`
 	Description string `gorm:"type:varchar(255)"`
 	Label       string `gorm:"type:varchar(255)"`
 	Posx        uint64
@@ -61,7 +61,7 @@ type Node struct {
 
 type Link struct {
 	gorm.Model
-	Name        string  `gorm:"type:varchar(255)"`
+	Name        string  `gorm:"type:varchar(255)" gorm:"unique"`
 	Status      string  `gorm:"type:varchar(255)"`
 	Description string  `gorm:"type:varchar(255)"`
 	Label       string  `gorm:"type:varchar(255)"`

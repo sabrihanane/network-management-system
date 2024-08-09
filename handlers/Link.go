@@ -29,6 +29,16 @@ func GetLinkById(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(link)
 }
 
+func GetLinkByName(c *fiber.Ctx) error {
+	name := c.Params("name")
+	var link models.Link
+	err := database.DB.Where("name = ?", name).First(&link)
+	if err.Error != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Link not found"})
+	}
+	return c.Status(fiber.StatusOK).JSON(link)
+}
+
 func CreateLink(c *fiber.Ctx) error {
 	link := new(models.Link)
 

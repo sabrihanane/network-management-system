@@ -30,6 +30,16 @@ func GetNodeById(c *fiber.Ctx) error {
 
 }
 
+func GetNodeByName(c *fiber.Ctx) error {
+	name := c.Params("name")
+	var node models.Node
+	err := database.DB.Where("name = ?", name).First(&node)
+	if err.Error != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Node not found"})
+	}
+	return c.Status(fiber.StatusOK).JSON(node)
+}
+
 func CreateNode(c *fiber.Ctx) error {
 	node := new(models.Node)
 
